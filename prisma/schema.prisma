@@ -1,0 +1,70 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id       String @id @default(cuid())
+  email    String @unique
+  password String // Hashed
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String   // Texto curto para o card
+  content     String   // Markdown ou HTML para a página de detalhes
+  
+  // Links externos
+  githubUrl   String?
+  liveUrl     String?
+  
+  // Controles
+  featured    Boolean  @default(false)
+  isVisible   Boolean  @default(true)
+  order       Int      @default(0)
+  
+  // Relacionamentos
+  technologies Technology[] // Relação N:N (Implícita do Prisma)
+  images       ProjectImage[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Technology {
+  id        String    @id @default(cuid())
+  name      String    // Ex: "Next.js"
+  iconKey   String    // Nome do ícone na lib Lucide (ex: "SiNextdotjs") ou URL SVG
+  projects  Project[]
+}
+
+model ProjectImage {
+  id        String  @id @default(cuid())
+  url       String  // URL da imagem no Storage
+  alt       String?
+  
+  // Configuração do Mockup
+  isCover   Boolean @default(false) // Se true, é a capa do card
+  type      String  @default("DESKTOP") // Enum conceitual: "DESKTOP" | "MOBILE"
+  
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Experience {
+  id          String    @id @default(cuid())
+  company     String
+  role        String
+  startDate   DateTime
+  endDate     DateTime? // Null indica "Atualmente"
+  description String
+  isRemote    Boolean   @default(false)
+}
