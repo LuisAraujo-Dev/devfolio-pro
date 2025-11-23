@@ -70,7 +70,6 @@ export async function updateProject(id: string, formData: FormData) {
   const githubUrl = formData.get("githubUrl") as string;
   const liveUrl = formData.get("liveUrl") as string;
   
-  // Tratamento de Checkboxes: Se vier 'on', é true. Se null, é false.
   const isVisible = formData.get("isVisible") === "on";
   const featured = formData.get("featured") === "on";
 
@@ -96,4 +95,35 @@ export async function updateProject(id: string, formData: FormData) {
   revalidatePath("/admin/projects");
   revalidatePath(`/admin/projects/${id}/edit`);
   redirect("/admin/projects");
+}
+
+export async function createTechnology(formData: FormData) {
+  const name = formData.get("name") as string;
+  const iconKey = formData.get("iconKey") as string; 
+
+  try {
+    await prisma.technology.create({
+      data: {
+        name,
+        iconKey: iconKey || "Code", 
+      },
+    });
+  } catch (error) {
+    console.error("Erro ao criar tech:", error);
+    throw new Error("Erro ao criar tecnologia.");
+  }
+
+  revalidatePath("/admin/techs");
+}
+
+export async function deleteTechnology(id: string) {
+  try {
+    await prisma.technology.delete({
+      where: { id },
+    });
+  } catch (error) {
+    console.error("Erro ao deletar tech:", error);
+    throw new Error("Erro ao deletar tecnologia.");
+  }
+  revalidatePath("/admin/techs");
 }
