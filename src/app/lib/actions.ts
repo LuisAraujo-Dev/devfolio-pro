@@ -59,4 +59,41 @@ export async function createProject(formData: FormData) {
   // Limpa o cache da página de lista e redireciona
   revalidatePath("/admin/projects");
   redirect("/admin/projects");
+
+}
+
+export async function updateProject(id: string, formData: FormData) {
+  const title = formData.get("title") as string;
+  const slug = formData.get("slug") as string;
+  const description = formData.get("description") as string;
+  const content = formData.get("content") as string; 
+  const githubUrl = formData.get("githubUrl") as string;
+  const liveUrl = formData.get("liveUrl") as string;
+  
+  // Tratamento de Checkboxes: Se vier 'on', é true. Se null, é false.
+  const isVisible = formData.get("isVisible") === "on";
+  const featured = formData.get("featured") === "on";
+
+  try {
+    await prisma.project.update({
+      where: { id },
+      data: {
+        title,
+        slug,
+        description,
+        content,
+        githubUrl: githubUrl || null,
+        liveUrl: liveUrl || null,
+        isVisible,
+        featured,
+      },
+    });
+  } catch (error) {
+    console.error("Erro ao atualizar projeto:", error);
+    throw new Error("Erro ao atualizar. Verifique os dados.");
+  }
+
+  revalidatePath("/admin/projects");
+  revalidatePath(`/admin/projects/${id}/edit`);
+  redirect("/admin/projects");
 }
