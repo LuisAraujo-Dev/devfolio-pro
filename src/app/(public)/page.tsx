@@ -1,65 +1,103 @@
 // src/app/page.tsx
-import { ProjectCard } from "@/src/components/public/ProjectCard";
 import { PrismaClient } from "@prisma/client";
-import { ArrowRight, Github, Linkedin, Mail } from "lucide-react";
+import { ArrowRight, Github, Linkedin, Mail, Award } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+import { ProjectCard } from "@/src/components/public/ProjectCard";
+import { CertificationCard } from "@/src/components/public/CertificationCard";
 
 const prisma = new PrismaClient();
 
 export default async function HomePage() {
+  // 1. Buscar dados do Perfil
+  const profile = await prisma.profile.findFirst();
+
+  // 2. Buscar Projetos (Visíveis)
   const projects = await prisma.project.findMany({
     where: { isVisible: true },
     orderBy: [
-      { featured: "desc" },
+      { featured: "desc" }, 
       { updatedAt: "desc" }, 
     ],
     include: {
       technologies: true,
       images: true,
     },
+    take: 6, 
   });
+
+  // 3. Buscar Certificações
+  const certifications = await prisma.certification.findMany({
+    orderBy: { issuedAt: "desc" },
+    include: { technologies: true },
+  });
+
+  // Dados com fallback
+  const data = {
+    name: profile?.name || "Luís",
+    headline: profile?.headline || "Transformando ideias em experiências digitais.",
+    bio: profile?.bio || "Engenheiro de Software...",
+    profileUrl: profile?.profileUrl,
+    github: profile?.githubUrl,
+    linkedin: profile?.linkedinUrl,
+    email: profile?.email,
+  };
 
   return (
     <div className="pb-20">
+      
       {/* --- Hero Section --- */}
-      <section className="relative flex min-h-[80vh] flex-col justify-center overflow-hidden px-6 pt-20">
-        {/* Background Glow Effect */}
+      <section className="relative flex min-h-[85vh] flex-col justify-center overflow-hidden px-6 pt-20">
         <div className="absolute -top-[20%] -right-[10%] h-[500px] w-[500px] rounded-full bg-primary/20 blur-[120px]" />
         <div className="absolute top-[40%] -left-[10%] h-[300px] w-[300px] rounded-full bg-blue-600/10 blur-[100px]" />
 
-        <div className="container mx-auto max-w-5xl relative z-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-6">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-            </span>
-            Disponível para novos projetos
-          </div>
-          
-          <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-7xl md:leading-tight">
-            Transformando ideias em <br />
-            <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-blue-400">
-              experiências digitais.
-            </span>
-          </h1>
-          
-          <p className="mt-6 max-w-2xl text-lg text-muted md:text-xl">
-            Olá, eu sou o Luís. Engenheiro de Software focado em construir aplicações web performáticas, escaláveis e com design excepcional.
-          </p>
+        <div className="container mx-auto max-w-6xl relative z-10 grid lg:grid-cols-2 gap-12 items-center">
+          <div className="order-2 lg:order-1">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-6">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+              </span>
+              Disponível para novos projetos
+            </div>
 
-          <div className="mt-8 flex flex-wrap gap-4">
-            <Link
-              href="#projects"
-              className="flex items-center gap-2 rounded-full bg-primary px-8 py-3.5 font-semibold text-white hover:bg-primary/90 transition-all hover:scale-105"
-            >
-              Ver Projetos
-              <ArrowRight className="size-4" />
-            </Link>
-            
-            <div className="flex items-center gap-4 px-4">
-              <a href="#" className="text-muted hover:text-white transition-colors"><Github className="size-6"/></a>
-              <a href="#" className="text-muted hover:text-white transition-colors"><Linkedin className="size-6"/></a>
-              <a href="#" className="text-muted hover:text-white transition-colors"><Mail className="size-6"/></a>
+            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-6xl md:leading-tight">
+              {data.headline}
+            </h1>
+
+            <p className="mt-6 max-w-xl text-lg text-muted md:text-xl leading-relaxed">
+              Olá, eu sou o <strong className="text-white">{data.name}</strong>. {data.bio}
+            </p>
+
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Link
+                href="#projects"
+                className="flex items-center gap-2 rounded-full bg-primary px-8 py-3.5 font-semibold text-white hover:bg-primary/90 transition-all hover:scale-105 shadow-lg shadow-primary/25"
+              >
+                Ver Projetos
+                <ArrowRight className="size-4" />
+              </Link>
+
+              <div className="flex items-center gap-4 px-4">
+                {data.github && <a href={data.github} target="_blank" className="text-muted hover:text-white transition-colors"><Github className="size-6" /></a>}
+                {data.linkedin && <a href={data.linkedin} target="_blank" className="text-muted hover:text-white transition-colors"><Linkedin className="size-6" /></a>}
+                {data.email && <a href={`mailto:${data.email}`} className="text-muted hover:text-white transition-colors"><Mail className="size-6" /></a>}
+              </div>
+            </div>
+          </div>
+
+          <div className="order-1 lg:order-2 flex justify-center lg:justify-end relative">
+            <div className="relative size-[280px] sm:size-[350px] lg:size-[400px]">
+              <div className="absolute inset-0 bg-primary/30 blur-[60px] rounded-full transform scale-90"></div>
+              <div className="relative w-full h-full rounded-full border-2 border-white/10 bg-surface/50 p-2 backdrop-blur-sm shadow-2xl">
+                <div className="relative w-full h-full rounded-full overflow-hidden bg-black/40">
+                  {data.profileUrl ? (
+                    <Image src={data.profileUrl} alt={data.name} fill className="object-cover" unoptimized priority />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-muted text-sm">Sem Foto</div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -72,8 +110,11 @@ export default async function HomePage() {
             <h2 className="text-3xl font-bold text-white">Projetos Selecionados</h2>
             <p className="mt-2 text-muted">Uma coleção do meu melhor trabalho.</p>
           </div>
-          <Link href="/projects" className="hidden text-sm font-medium text-primary hover:underline sm:block">
-            Ver todos os projetos -{'>'}
+          <Link
+            href="/projects"
+            className="hidden text-sm font-medium text-primary hover:underline sm:block"
+          >
+            Ver todos os projetos -&gt;
           </Link>
         </div>
 
@@ -86,16 +127,42 @@ export default async function HomePage() {
         ) : (
           <div className="py-20 text-center border border-dashed border-white/10 rounded-xl bg-surface/30">
             <p className="text-muted">Nenhum projeto publicado ainda.</p>
-            <p className="text-xs text-muted mt-1">Acesse o /admin para cadastrar.</p>
           </div>
         )}
-        
+
         <div className="mt-8 text-center sm:hidden">
-          <Link href="/projects" className="text-sm font-medium text-primary hover:underline">
-             Ver todos os projetos -{'>'}
+          <Link
+            href="/projects"
+            className="text-sm font-medium text-primary hover:underline"
+          >
+            Ver todos os projetos -&gt;
           </Link>
         </div>
       </section>
+
+      {/* --- Certifications Section --- */}
+      <section id="certifications" className="container mx-auto max-w-6xl px-6 py-20 border-t border-white/10">
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold text-white flex items-center gap-3">
+            <Award className="size-8 text-primary" />
+            Cursos & Certificações
+          </h2>
+          <p className="mt-2 text-muted">Aprimoramento constante e especializações.</p>
+        </div>
+
+        {certifications.length > 0 ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {certifications.map((cert) => (
+              <CertificationCard key={cert.id} certification={cert} />
+            ))}
+          </div>
+        ) : (
+          <div className="py-20 text-center border border-dashed border-white/10 rounded-xl bg-surface/30">
+            <p className="text-muted">Nenhuma certificação cadastrada ainda.</p>
+          </div>
+        )}
+      </section>
+
     </div>
   );
 }

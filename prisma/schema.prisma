@@ -12,27 +12,24 @@ datasource db {
 model Admin {
   id       String @id @default(cuid())
   email    String @unique
-  password String // Hashed
+  password String 
 }
 
 model Project {
   id          String   @id @default(cuid())
   title       String
   slug        String   @unique
-  description String   // Texto curto para o card
-  content     String   // Markdown ou HTML para a página de detalhes
+  description String   
+  content     String   
   
-  // Links externos
   githubUrl   String?
   liveUrl     String?
   
-  // Controles
   featured    Boolean  @default(false)
   isVisible   Boolean  @default(true)
   order       Int      @default(0)
   
-  // Relacionamentos
-  technologies Technology[] // Relação N:N (Implícita do Prisma)
+  technologies Technology[] 
   images       ProjectImage[]
   
   createdAt   DateTime @default(now())
@@ -41,9 +38,12 @@ model Project {
 
 model Technology {
   id        String    @id @default(cuid())
-  name      String    // Ex: "Next.js"
-  iconKey   String    // Nome do ícone na lib Lucide (ex: "SiNextdotjs") ou URL SVG
+  name      String    
+  iconKey   String    
+  
   projects  Project[]
+  
+  certifications Certification[]
 }
 
 model ProjectImage {
@@ -65,7 +65,7 @@ model Experience {
   company     String
   role        String
   startDate   DateTime
-  endDate     DateTime? // Null indica "Atualmente"
+  endDate     DateTime? 
   description String
   isRemote    Boolean   @default(false)
 }
@@ -73,15 +73,28 @@ model Experience {
 model Profile {
   id          String   @id @default(cuid())
   name        String
-  headline    String   // Título principal da Home
-  bio         String   // Texto curto da Home
-  about       String   // Texto longo da página Sobre
-  profileUrl  String?  // URL da sua foto
+  headline    String   
+  bio         String   
+  about       String   
+  profileUrl  String?  
   
-  // Links Sociais
   githubUrl   String?
   linkedinUrl String?
   email       String?
 
   updatedAt   DateTime @updatedAt
+}
+
+model Certification {
+  id            String   @id @default(cuid())
+  name          String
+  institution   String
+  issuedAt      DateTime
+  imageUrl      String
+  credentialUrl String?
+  highlights    String
+  
+  technologies  Technology[] 
+
+  createdAt     DateTime @default(now())
 }

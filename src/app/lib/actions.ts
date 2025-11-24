@@ -271,3 +271,57 @@ export async function deleteExperience(id: string) {
   revalidatePath("/about");
   revalidatePath("/admin/experiences");
 }
+
+export async function createCertification(formData: FormData) {
+  const name = formData.get("name") as string;
+  const institution = formData.get("institution") as string;
+  const issuedAtStr = formData.get("issuedAt") as string;
+  const credentialUrl = formData.get("credentialUrl") as string;
+  const highlights = formData.get("highlights") as string;
+  
+  const technologyIds = formData.getAll("technologies") as string[];
+
+  const file = formData.get("file") as File;
+  let imageUrl = "";
+  
+  if (file && file.size > 0) {
+    const uploadedPath = await uploadFile(file);
+    if (uploadedPath) imageUrl = uploadedPath;
+  }
+
+  if (!imageUrl) {
+    console.error("Imagem é obrigatória");
+  }
+
+  try {
+    await prisma.certification.create({
+      data: {
+        name,
+        institution,
+        issuedAt: new Date(issuedAtStr),
+        credentialUrl: credentialUrl || null,
+        highlights,
+        imageUrl,
+        technologies: {
+          connect: technologyIds.map((id) => ({ id })),
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Erro ao criar certificação:", error);
+    throw new Error("Erro ao criar certificação.");
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin/certifications");
+}
+
+export async function deleteCertification(id: string) {
+  try {
+    await prisma.certification.delete({ where: { id } });
+  } catch (error) {
+    console.error("Erro ao deletar certificação:", error);
+  }
+  revalidatePath("/");
+  revalidatePath("/admin/certifications");
+}
