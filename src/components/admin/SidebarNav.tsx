@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FolderKanban, User, Cpu } from "lucide-react";
+import { LayoutDashboard, FolderKanban, User, Cpu, Briefcase } from "lucide-react";
 
 export function SidebarNav() {
   const pathname = usePathname();
@@ -32,6 +32,11 @@ export function SidebarNav() {
       icon: Cpu,
     },
     {
+      name: "Experiência",
+      href: "/admin/experiences",
+      icon: Briefcase,
+    },
+    {
       name: "Meu Perfil",
       href: "/admin/profile",
       icon: User,
@@ -52,7 +57,7 @@ export function SidebarNav() {
               flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors
               ${
                 active
-                  ? "bg-primary/10 text-primary border border-primary/20" 
+                  ? "bg-primary/10 text-primary border border-primary/20"
                   : "text-muted hover:text-white hover:bg-white/5 border border-transparent" 
               }
             `}

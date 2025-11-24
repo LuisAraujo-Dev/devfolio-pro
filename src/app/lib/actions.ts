@@ -233,3 +233,41 @@ export async function addImage(projectId: string, formData: FormData) {
   
   revalidatePath(`/admin/projects/${projectId}/edit`);
 }
+
+export async function createExperience(formData: FormData) {
+  const company = formData.get("company") as string;
+  const role = formData.get("role") as string;
+  const description = formData.get("description") as string;
+  const startDateStr = formData.get("startDate") as string;
+  const endDateStr = formData.get("endDate") as string;
+  const isRemote = formData.get("isRemote") === "on";
+
+  try {
+    await prisma.experience.create({
+      data: {
+        company,
+        role,
+        description,
+        startDate: new Date(startDateStr),
+        endDate: endDateStr ? new Date(endDateStr) : null,
+        isRemote,
+      },
+    });
+  } catch (error) {
+    console.error("Erro ao criar experiência:", error);
+    throw new Error("Erro ao criar experiência.");
+  }
+
+  revalidatePath("/about");
+  revalidatePath("/admin/experiences");
+}
+
+export async function deleteExperience(id: string) {
+  try {
+    await prisma.experience.delete({ where: { id } });
+  } catch (error) {
+    console.error("Erro ao deletar experiência:", error);
+  }
+  revalidatePath("/about");
+  revalidatePath("/admin/experiences");
+}
