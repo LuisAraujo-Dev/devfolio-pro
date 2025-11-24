@@ -1,7 +1,7 @@
 // src/app/(admin)/layout.tsx
-import Link from "next/link";
-import { LayoutDashboard, FolderKanban, User, LogOut } from "lucide-react"; 
 import { signOut } from "@/src/auth";
+import { SidebarNav } from "@/src/components/admin/SidebarNav";
+import { LogOut } from "lucide-react";
 
 export default function AdminLayout({
   children,
@@ -16,41 +16,8 @@ export default function AdminLayout({
           <span className="text-lg font-bold text-white">DevFolio Admin</span>
         </div>
 
-        <nav className="flex-1 flex flex-col gap-2 p-4 overflow-y-auto">
-          <Link
-            href="/admin"
-            className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-white bg-white/5 rounded-md hover:bg-white/10 transition-colors"
-          >
-            <LayoutDashboard className="size-5 text-primary" />
-            Dashboard
-          </Link>
-          
-          <Link
-            href="/admin/projects"
-            className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-muted hover:text-white hover:bg-white/5 rounded-md transition-colors"
-          >
-            <FolderKanban className="size-5" />
-            Projetos
-          </Link>
-
-          {/* ATUALIZADO: Link para o Perfil em vez de Configurações */}
-          <Link
-            href="/admin/profile"
-            className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-muted hover:text-white hover:bg-white/5 rounded-md transition-colors"
-          >
-            <User className="size-5" />
-            Meu Perfil
-          </Link>
-
-          {/* Adicione aqui o link de Techs se quiser acesso rápido */}
-          <Link
-             href="/admin/techs"
-             className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-muted hover:text-white hover:bg-white/5 rounded-md transition-colors"
-           >
-             <span className="flex items-center justify-center size-5 font-mono font-bold border border-muted rounded text-[10px]">TS</span>
-             Tecnologias
-           </Link>
-        </nav>
+        {/* Componente de Navegação (Client Side) */}
+        <SidebarNav />
 
         <div className="p-4 border-t border-white/10 mt-auto">
           {/* Server Action para Logout */}
