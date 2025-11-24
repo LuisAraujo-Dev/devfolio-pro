@@ -1,26 +1,29 @@
-// prisma/seed.ts
 import { PrismaClient } from '@prisma/client'
 import { hash } from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
 async function main() {
-  const email = 'luisaraujo.dev@gmail.com' 
-  const password = '12345678'     
+  const email = process.env.ADMIN_EMAIL
+  const password = process.env.ADMIN_PASSWORD
 
-  // Criptografa a senha antes de salvar
+  if (!email || !password) {
+    console.error('❌ Erro: ADMIN_EMAIL e ADMIN_PASSWORD devem ser definidos no .env')
+    process.exit(1)
+  }
+
   const hashedPassword = await hash(password, 12)
 
   const user = await prisma.admin.upsert({
     where: { email },
-    update: {}, 
+    update: { password: hashedPassword },
     create: {
       email,
       password: hashedPassword,
     },
   })
 
-  console.log(`Admin criado com sucesso: ${user.email}`)
+  console.log(`✅ Admin configurado com sucesso: ${user.email}`)
 }
 
 main()
