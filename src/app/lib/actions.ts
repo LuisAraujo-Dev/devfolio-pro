@@ -67,12 +67,14 @@ export async function updateProject(id: string, formData: FormData) {
   const title = formData.get("title") as string;
   const slug = formData.get("slug") as string;
   const description = formData.get("description") as string;
-  const content = formData.get("content") as string; 
+  const content = formData.get("content") as string;
   const githubUrl = formData.get("githubUrl") as string;
   const liveUrl = formData.get("liveUrl") as string;
   
   const isVisible = formData.get("isVisible") === "on";
   const featured = formData.get("featured") === "on";
+
+  const technologyIds = formData.getAll("technologies") as string[];
 
   try {
     await prisma.project.update({
@@ -86,11 +88,15 @@ export async function updateProject(id: string, formData: FormData) {
         liveUrl: liveUrl || null,
         isVisible,
         featured,
+        
+        technologies: {
+          set: technologyIds.map((techId) => ({ id: techId })),
+        },
       },
     });
   } catch (error) {
     console.error("Erro ao atualizar projeto:", error);
-    throw new Error("Erro ao atualizar. Verifique os dados.");
+    throw new Error("Erro ao atualizar.");
   }
 
   revalidatePath("/admin/projects");
@@ -184,29 +190,25 @@ export async function saveProfile(formData: FormData) {
     throw new Error("Erro ao salvar perfil.");
   }
 
-  // Atualiza as páginas que usam esses dados
   revalidatePath("/");
   revalidatePath("/about");
   revalidatePath("/admin/profile");
-  redirect("/admin/profile"); // Recarrega a página atual
+  redirect("/admin/profile");
 }
 
 export async function addImage(projectId: string, formData: FormData) {
-  // Alterado de 'url' (string) para 'file' (File)
   const file = formData.get("file") as File; 
   const type = formData.get("type") as string;
 
   if (!file) return;
 
   try {
-    // 1. Faz o upload físico
     const publicUrl = await uploadFile(file);
 
     if (!publicUrl) {
       throw new Error("Falha ao gerar URL do arquivo");
     }
 
-    // 2. Salva no banco com o caminho local (/uploads/...)
     await prisma.projectImage.create({
       data: {
         projectId,

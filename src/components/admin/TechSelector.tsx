@@ -15,18 +15,21 @@ interface TechSelectorProps {
 }
 
 export function TechSelector({ availableTechs, initialSelectedIds }: TechSelectorProps) {
-  const [selectedIds, setSelectedIds] = useState<string[]>(initialSelectedIds);
+  const [selectedIds, setSelectedIds] = useState<string[]>(initialSelectedIds || []);
 
   const toggleTech = (id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id)
-        ? prev.filter((item) => item !== id) 
-        : [...prev, id] 
-    );
+    setSelectedIds((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((item) => item !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
   };
 
   return (
     <div className="space-y-3">
+      {/* Botões Visuais */}
       <div className="flex flex-wrap gap-2">
         {availableTechs.map((tech) => {
           const isSelected = selectedIds.includes(tech.id);
@@ -36,7 +39,7 @@ export function TechSelector({ availableTechs, initialSelectedIds }: TechSelecto
               type="button" 
               onClick={() => toggleTech(tech.id)}
               className={`
-                group flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-all
+                group flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-all cursor-pointer
                 ${
                   isSelected
                     ? 'border-primary bg-primary/20 text-primary'
@@ -55,14 +58,18 @@ export function TechSelector({ availableTechs, initialSelectedIds }: TechSelecto
         })}
       </div>
 
-      {/* Inputs ocultos para enviar ao Server Action */}
       {selectedIds.map((id) => (
-        <input key={id} type="hidden" name="technologies" value={id} />
+        <input 
+          key={id} 
+          type="hidden" 
+          name="technologies" 
+          value={id} 
+        />
       ))}
       
       {availableTechs.length === 0 && (
         <p className="text-sm text-muted">
-          Nenhuma tecnologia cadastrada. Vá em Techs para adicionar.
+          Nenhuma tecnologia cadastrada.
         </p>
       )}
     </div>
