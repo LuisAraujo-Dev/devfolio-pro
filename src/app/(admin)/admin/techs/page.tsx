@@ -48,7 +48,7 @@ export default async function TechsPage() {
           </div>
           <button
             type="submit"
-            className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-medium text-white hover:bg-primary/90 transition-colors mb-[1px]"
+            className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-medium text-white hover:bg-primary/90 transition-colors mb-1px"
           >
             <Save className="size-4" />
             Adicionar
