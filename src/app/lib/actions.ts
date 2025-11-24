@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { signIn } from '@/src/auth';
+import { uploadFile } from './upload';
 
 // Instância do Prisma (Idealmente mover para um singleton src/lib/prisma.ts no futuro)
 const prisma = new PrismaClient();
@@ -128,29 +129,6 @@ export async function deleteTechnology(id: string) {
   revalidatePath("/admin/techs");
 }
 
-export async function addImage(projectId: string, formData: FormData) {
-  const url = formData.get("url") as string;
-  const type = formData.get("type") as string; // "DESKTOP" | "MOBILE"
-
-  if (!url) return;
-
-  try {
-    await prisma.projectImage.create({
-      data: {
-        projectId,
-        url,
-        type: type || "DESKTOP",
-        isCover: false, // Padrão false
-      },
-    });
-  } catch (error) {
-    console.error("Erro ao adicionar imagem:", error);
-    throw new Error("Erro ao adicionar imagem.");
-  }
-  
-  revalidatePath(`/admin/projects/${projectId}/edit`);
-}
-
 export async function deleteImage(imageId: string, projectId: string) {
   try {
     await prisma.projectImage.delete({ where: { id: imageId } });
@@ -211,4 +189,36 @@ export async function saveProfile(formData: FormData) {
   revalidatePath("/about");
   revalidatePath("/admin/profile");
   redirect("/admin/profile"); // Recarrega a página atual
+}
+
+export async function addImage(projectId: string, formData: FormData) {
+  // Alterado de 'url' (string) para 'file' (File)
+  const file = formData.get("file") as File; 
+  const type = formData.get("type") as string;
+
+  if (!file) return;
+
+  try {
+    // 1. Faz o upload físico
+    const publicUrl = await uploadFile(file);
+
+    if (!publicUrl) {
+      throw new Error("Falha ao gerar URL do arquivo");
+    }
+
+    // 2. Salva no banco com o caminho local (/uploads/...)
+    await prisma.projectImage.create({
+      data: {
+        projectId,
+        url: publicUrl,
+        type: type || "DESKTOP",
+        isCover: false,
+      },
+    });
+  } catch (error) {
+    console.error("Erro ao adicionar imagem:", error);
+    throw new Error("Erro ao adicionar imagem.");
+  }
+  
+  revalidatePath(`/admin/projects/${projectId}/edit`);
 }
