@@ -1,4 +1,6 @@
+// src/app/(admin)/admin/projects/[id]/edit/page.tsx
 import { updateProject } from "@/src/app/lib/actions";
+import { ImageManager } from "@/src/components/admin/ImageManager";
 import { TechSelector } from "@/src/components/admin/TechSelector";
 import { PrismaClient } from "@prisma/client";
 import { ArrowLeft, Save, Trash2, ExternalLink } from "lucide-react";
@@ -14,13 +16,18 @@ export default async function EditProjectPage({
 }) {
   const { id } = await params;
 
+  // 1. Busca os dados atuais do projeto INCLUINDO as tecnologias e imagens
   const project = await prisma.project.findUnique({
     where: { id },
     include: {
       technologies: true,
+      images: {
+        orderBy: { createdAt: "asc" }, // Ordena imagens pela ordem de upload
+      },
     },
   });
 
+  // 2. Busca todas as tecnologias disponíveis para popular o seletor
   const allTechs = await prisma.technology.findMany({
     orderBy: { name: "asc" },
   });
@@ -29,8 +36,10 @@ export default async function EditProjectPage({
     return notFound();
   }
 
+  // Prepara o array de IDs para o componente TechSelector
   const selectedTechIds = project.technologies.map((t) => t.id);
 
+  // Faz o bind do ID do projeto na Server Action
   const updateProjectWithId = updateProject.bind(null, project.id);
 
   return (
@@ -77,6 +86,7 @@ export default async function EditProjectPage({
         <div className="grid gap-6 lg:grid-cols-3">
           {/* --- Coluna Principal (Esquerda) --- */}
           <div className="lg:col-span-2 space-y-6">
+            
             {/* Infos Básicas */}
             <div className="rounded-xl border border-white/10 bg-surface p-6 space-y-4">
               <h3 className="font-semibold text-white">Informações Principais</h3>
@@ -125,11 +135,24 @@ export default async function EditProjectPage({
                 className="w-full rounded-md border border-white/10 bg-background px-3 py-2 text-white font-mono text-sm focus:border-primary focus:outline-none"
               />
             </div>
+
+            {/* Galeria e Mockups (NOVO) */}
+            <div className="rounded-xl border border-white/10 bg-surface p-6 space-y-4">
+              <h3 className="font-semibold text-white">Galeria e Mockups</h3>
+              <p className="text-xs text-muted">
+                Adicione prints do projeto. Defina se é Desktop ou Mobile para
+                gerar o mockup correto.
+              </p>
+
+              {/* Componente Client-Side de Imagens */}
+              <ImageManager projectId={project.id} images={project.images} />
+            </div>
           </div>
 
           {/* --- Coluna Lateral (Direita) --- */}
           <div className="space-y-6">
-            {/* Seletor de Tecnologias (NOVO) */}
+            
+            {/* Seletor de Tecnologias */}
             <div className="rounded-xl border border-white/10 bg-surface p-6 space-y-4">
               <h3 className="font-semibold text-white">Tecnologias Usadas</h3>
               <TechSelector

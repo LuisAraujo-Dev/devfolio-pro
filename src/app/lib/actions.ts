@@ -127,3 +127,53 @@ export async function deleteTechnology(id: string) {
   }
   revalidatePath("/admin/techs");
 }
+
+export async function addImage(projectId: string, formData: FormData) {
+  const url = formData.get("url") as string;
+  const type = formData.get("type") as string; // "DESKTOP" | "MOBILE"
+
+  if (!url) return;
+
+  try {
+    await prisma.projectImage.create({
+      data: {
+        projectId,
+        url,
+        type: type || "DESKTOP",
+        isCover: false, // Padrão false
+      },
+    });
+  } catch (error) {
+    console.error("Erro ao adicionar imagem:", error);
+    throw new Error("Erro ao adicionar imagem.");
+  }
+  
+  revalidatePath(`/admin/projects/${projectId}/edit`);
+}
+
+export async function deleteImage(imageId: string, projectId: string) {
+  try {
+    await prisma.projectImage.delete({ where: { id: imageId } });
+  } catch (error) {
+    console.error("Erro ao deletar imagem:", error);
+  }
+  revalidatePath(`/admin/projects/${projectId}/edit`);
+}
+
+export async function setCoverImage(imageId: string, projectId: string) {
+  try {
+    await prisma.$transaction([
+      prisma.projectImage.updateMany({
+        where: { projectId },
+        data: { isCover: false },
+      }),
+      prisma.projectImage.update({
+        where: { id: imageId },
+        data: { isCover: true },
+      }),
+    ]);
+  } catch (error) {
+    console.error("Erro ao definir capa:", error);
+  }
+  revalidatePath(`/admin/projects/${projectId}/edit`);
+}

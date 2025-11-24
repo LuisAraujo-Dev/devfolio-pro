@@ -47,16 +47,17 @@ model Technology {
 }
 
 model ProjectImage {
-  id        String  @id @default(cuid())
-  url       String  // URL da imagem no Storage
+  id        String   @id @default(cuid())
+  url       String
   alt       String?
   
-  // Configuração do Mockup
-  isCover   Boolean @default(false) // Se true, é a capa do card
-  type      String  @default("DESKTOP") // Enum conceitual: "DESKTOP" | "MOBILE"
+  isCover   Boolean  @default(false)
+  type      String   @default("DESKTOP")
   
   projectId String
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 }
 
 model Experience {
