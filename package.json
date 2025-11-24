@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-  "dev": "next dev",
-  "build": "npx prisma generate && npx prisma migrate deploy && next build",
-  "start": "next start",
-  "lint": "next lint"
-},
+    "dev": "next dev",
+    "build": "npx prisma generate && npx prisma migrate deploy && next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
   "dependencies": {
+    "@vercel/blob": "^2.0.0",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.24",
