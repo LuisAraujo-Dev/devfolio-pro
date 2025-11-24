@@ -167,10 +167,19 @@ export async function saveProfile(formData: FormData) {
   const headline = formData.get("headline") as string;
   const bio = formData.get("bio") as string;
   const about = formData.get("about") as string;
-  const profileUrl = formData.get("profileUrl") as string;
   const githubUrl = formData.get("githubUrl") as string;
   const linkedinUrl = formData.get("linkedinUrl") as string;
   const email = formData.get("email") as string;
+
+  const file = formData.get("file") as File;
+  let profileUrl = formData.get("profileUrl") as string;
+
+  if (file && file.size > 0) {
+    const uploadedPath = await uploadFile(file);
+    if (uploadedPath) {
+      profileUrl = uploadedPath;
+    }
+  }
 
   try {
     const existingProfile = await prisma.profile.findFirst();
