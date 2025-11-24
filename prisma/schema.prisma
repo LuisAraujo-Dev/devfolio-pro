@@ -69,3 +69,19 @@ model Experience {
   description String
   isRemote    Boolean   @default(false)
 }
+
+model Profile {
+  id          String   @id @default(cuid())
+  name        String
+  headline    String   // Título principal da Home
+  bio         String   // Texto curto da Home
+  about       String   // Texto longo da página Sobre
+  profileUrl  String?  // URL da sua foto
+  
+  // Links Sociais
+  githubUrl   String?
+  linkedinUrl String?
+  email       String?
+
+  updatedAt   DateTime @updatedAt
+}

@@ -177,3 +177,38 @@ export async function setCoverImage(imageId: string, projectId: string) {
   }
   revalidatePath(`/admin/projects/${projectId}/edit`);
 }
+
+export async function saveProfile(formData: FormData) {
+  const name = formData.get("name") as string;
+  const headline = formData.get("headline") as string;
+  const bio = formData.get("bio") as string;
+  const about = formData.get("about") as string;
+  const profileUrl = formData.get("profileUrl") as string;
+  const githubUrl = formData.get("githubUrl") as string;
+  const linkedinUrl = formData.get("linkedinUrl") as string;
+  const email = formData.get("email") as string;
+
+  try {
+    const existingProfile = await prisma.profile.findFirst();
+
+    if (existingProfile) {
+      await prisma.profile.update({
+        where: { id: existingProfile.id },
+        data: { name, headline, bio, about, profileUrl, githubUrl, linkedinUrl, email },
+      });
+    } else {
+      await prisma.profile.create({
+        data: { name, headline, bio, about, profileUrl, githubUrl, linkedinUrl, email },
+      });
+    }
+  } catch (error) {
+    console.error("Erro ao salvar perfil:", error);
+    throw new Error("Erro ao salvar perfil.");
+  }
+
+  // Atualiza as páginas que usam esses dados
+  revalidatePath("/");
+  revalidatePath("/about");
+  revalidatePath("/admin/profile");
+  redirect("/admin/profile"); // Recarrega a página atual
+}
