@@ -1,8 +1,8 @@
 // src/app/(public)/projects/[slug]/page.tsx
 import { LaptopMockup } from "@/src/components/mockups/LaptopMockup";
 import { PhoneMockup } from "@/src/components/mockups/PhoneMockup";
+import { TechBadge } from "@/src/components/public/TechBadge";
 import { PrismaClient } from "@prisma/client";
-
 import { ArrowLeft, ExternalLink, Github } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -45,31 +45,31 @@ export default async function ProjectDetailsPage({
           </Link>
         </div>
 
-        {/* --- Título e Techs --- */}
+        {/* --- Título, Descrição e Tecnologias --- */}
         <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between mb-16">
-          <div className="space-y-4">
+          <div className="space-y-4 max-w-3xl">
             <h1 className="text-4xl font-extrabold text-white md:text-5xl">
               {project.title}
             </h1>
-            <p className="text-xl text-muted max-w-2xl">
+            <p className="text-xl text-muted leading-relaxed">
               {project.description}
             </p>
             
-            {/* Lista de Tecnologias */}
-            <div className="flex flex-wrap gap-2 pt-2">
+            {/* Lista de Tecnologias com Ícones Coloridos (Devicon) */}
+            <div className="flex flex-wrap gap-3 pt-4">
               {project.technologies.map((tech) => (
-                <span
-                  key={tech.id}
-                  className="rounded-full border border-white/10 bg-surface px-3 py-1 text-sm text-muted"
-                >
-                  {tech.name}
-                </span>
+                <TechBadge 
+                  key={tech.id} 
+                  name={tech.name} 
+                  iconKey={tech.iconKey} 
+                  size="lg" 
+                />
               ))}
             </div>
           </div>
 
-          {/* Links de Ação */}
-          <div className="flex flex-wrap gap-3">
+          {/* Links de Ação (Github / Live) */}
+          <div className="flex flex-wrap gap-3 mt-4 md:mt-0">
             {project.liveUrl && (
               <a
                 href={project.liveUrl}
@@ -97,10 +97,8 @@ export default async function ProjectDetailsPage({
 
         {/* --- Galeria Dinâmica (Mockups) --- */}
         <section className="space-y-24">
-          {/* CORREÇÃO: Removido o argumento 'index' que não estava sendo usado */}
           {project.images.map((img) => (
             <div key={img.id} className="relative">
-              {/* Efeito de fundo sutil para destacar o mockup */}
               <div className="absolute inset-0 -z-10 bg-linear-to-b from-primary/5 to-transparent opacity-0 transition-opacity duration-700 hover:opacity-100" />
               
               {img.type === "MOBILE" ? (
@@ -120,7 +118,7 @@ export default async function ProjectDetailsPage({
           )}
         </section>
 
-        {/* --- Sobre o Projeto (Conteúdo Rico) --- */}
+        {/* --- Sobre o Projeto --- */}
         {project.content && (
           <section className="mt-24 border-t border-white/10 pt-16">
             <h2 className="text-2xl font-bold text-white mb-8">Sobre o Desenvolvimento</h2>
