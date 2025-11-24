@@ -7,7 +7,6 @@ import { redirect } from 'next/navigation';
 import { signIn } from '@/src/auth';
 import { uploadFile } from './upload';
 
-// Instância do Prisma (Idealmente mover para um singleton src/lib/prisma.ts no futuro)
 const prisma = new PrismaClient();
 
 export async function authenticate(
@@ -86,9 +85,8 @@ export async function updateProject(id: string, formData: FormData) {
         content,
         githubUrl: githubUrl || null,
         liveUrl: liveUrl || null,
-        isVisible,
+        isVisible, 
         featured,
-        
         technologies: {
           set: technologyIds.map((techId) => ({ id: techId })),
         },
@@ -99,8 +97,11 @@ export async function updateProject(id: string, formData: FormData) {
     throw new Error("Erro ao atualizar.");
   }
 
-  revalidatePath("/admin/projects");
-  revalidatePath(`/admin/projects/${id}/edit`);
+  revalidatePath("/");                 
+  revalidatePath("/projects");         
+  revalidatePath("/admin/projects");   
+  revalidatePath(`/admin/projects/${id}/edit`); 
+  
   redirect("/admin/projects");
 }
 
