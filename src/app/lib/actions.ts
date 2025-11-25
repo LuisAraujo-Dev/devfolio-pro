@@ -378,3 +378,33 @@ export async function updateCertification(id: string, formData: FormData) {
   revalidatePath("/admin/certifications");
   redirect("/admin/certifications");
 }
+
+export async function updateExperience(id: string, formData: FormData) {
+  const company = formData.get("company") as string;
+  const role = formData.get("role") as string;
+  const description = formData.get("description") as string;
+  const startDateStr = formData.get("startDate") as string;
+  const endDateStr = formData.get("endDate") as string;
+  const isRemote = formData.get("isRemote") === "on";
+
+  try {
+    await prisma.experience.update({
+      where: { id },
+      data: {
+        company,
+        role,
+        description,
+        startDate: new Date(startDateStr),
+        endDate: endDateStr ? new Date(endDateStr) : null, 
+        isRemote,
+      },
+    });
+  } catch (error) {
+    console.error("Erro ao atualizar experiência:", error);
+    throw new Error("Erro ao atualizar experiência.");
+  }
+
+  revalidatePath("/about");
+  revalidatePath("/admin/experiences");
+  redirect("/admin/experiences");
+}
