@@ -1,21 +1,20 @@
 import Link from "next/link";
 import { Plus, Search, FolderOpen, Eye, EyeOff, Pencil, Trash2 } from "lucide-react";
 import { PrismaClient } from "@prisma/client";
+import { deleteProject } from "@/src/app/lib/actions";
 
 const prisma = new PrismaClient();
 
 export default async function ProjectsPage() {
-  // Busca os projetos ordenados pelos mais recentes
   const projects = await prisma.project.findMany({
     orderBy: { updatedAt: "desc" },
     include: {
-      technologies: true, // Para mostrar quantas techs tem (opcional)
+      technologies: true,
     },
   });
 
   return (
     <div className="space-y-6">
-      {/* Cabeçalho da Página */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Meus Projetos</h1>
@@ -30,7 +29,6 @@ export default async function ProjectsPage() {
         </Link>
       </div>
 
-      {/* Barra de Filtros (Visual por enquanto) */}
       <div className="flex items-center gap-2 rounded-md border border-white/10 bg-surface px-3 py-2">
         <Search className="size-4 text-muted" />
         <input
@@ -40,9 +38,7 @@ export default async function ProjectsPage() {
         />
       </div>
 
-      {/* Listagem */}
       {projects.length === 0 ? (
-        // Estado Vazio
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/10 bg-surface/50 py-20 text-center">
           <div className="flex size-16 items-center justify-center rounded-full bg-white/5">
             <FolderOpen className="size-8 text-muted" />
@@ -53,7 +49,6 @@ export default async function ProjectsPage() {
           </p>
         </div>
       ) : (
-        // Tabela de Projetos
         <div className="overflow-hidden rounded-xl border border-white/10 bg-surface">
           <table className="w-full text-left text-sm">
             <thead className="bg-white/5 text-muted">
@@ -103,12 +98,22 @@ export default async function ProjectsPage() {
                       >
                         <Pencil className="size-4" />
                       </Link>
-                      <button
-                        className="rounded-md p-2 hover:bg-red-500/10 text-muted hover:text-red-400 transition-colors"
-                        title="Excluir"
+                      
+                      <form
+                        action={async () => {
+                          "use server";
+                          await deleteProject(project.id);
+                        }}
                       >
-                        <Trash2 className="size-4" />
-                      </button>
+                        <button
+                          type="submit"
+                          className="rounded-md p-2 hover:bg-red-500/10 text-muted hover:text-red-400 transition-colors"
+                          title="Excluir"
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
+                      </form>
+
                     </div>
                   </td>
                 </tr>

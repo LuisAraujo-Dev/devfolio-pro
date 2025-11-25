@@ -4,8 +4,8 @@ import { AuthError } from 'next-auth';
 import { PrismaClient } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { signIn } from '@/src/auth';
 import { uploadFile } from './upload';
+import { signIn } from '@/src/auth';
 
 const prisma = new PrismaClient();
 
@@ -29,7 +29,6 @@ export async function authenticate(
 }
 
 export async function createProject(formData: FormData) {
-  // Extraindo dados do formulário
   const title = formData.get("title") as string;
   const slug = formData.get("slug") as string;
   const description = formData.get("description") as string;
@@ -37,29 +36,25 @@ export async function createProject(formData: FormData) {
   const liveUrl = formData.get("liveUrl") as string;
 
   try {
-    // Criação no Banco de Dados
     await prisma.project.create({
       data: {
         title,
         slug,
         description,
-        content: "", 
+        content: "",
         githubUrl: githubUrl || null,
         liveUrl: liveUrl || null,
-        isVisible: false, 
+        isVisible: false,
         featured: false,
       },
     });
   } catch (error) {
     console.error("Erro ao criar projeto:", error);
-    // Em um cenário real, poderíamos retornar o erro para o form exibir
     throw new Error("Erro ao criar projeto. Verifique se o Slug já existe.");
   }
 
-  // Limpa o cache da página de lista e redireciona
   revalidatePath("/admin/projects");
   redirect("/admin/projects");
-
 }
 
 export async function updateProject(id: string, formData: FormData) {
@@ -85,7 +80,7 @@ export async function updateProject(id: string, formData: FormData) {
         content,
         githubUrl: githubUrl || null,
         liveUrl: liveUrl || null,
-        isVisible, 
+        isVisible,
         featured,
         technologies: {
           set: technologyIds.map((techId) => ({ id: techId })),
@@ -97,23 +92,40 @@ export async function updateProject(id: string, formData: FormData) {
     throw new Error("Erro ao atualizar.");
   }
 
-  revalidatePath("/");                 
-  revalidatePath("/projects");         
-  revalidatePath("/admin/projects");   
-  revalidatePath(`/admin/projects/${id}/edit`); 
+  revalidatePath("/");
+  revalidatePath("/projects");
+  revalidatePath("/admin/projects");
+  revalidatePath(`/admin/projects/${id}/edit`);
+  
+  redirect("/admin/projects");
+}
+
+export async function deleteProject(id: string) {
+  try {
+    await prisma.project.delete({
+      where: { id },
+    });
+  } catch (error) {
+    console.error("Erro ao deletar projeto:", error);
+    throw new Error("Falha ao deletar o projeto.");
+  }
+
+  revalidatePath("/admin/projects");
+  revalidatePath("/");
+  revalidatePath("/projects");
   
   redirect("/admin/projects");
 }
 
 export async function createTechnology(formData: FormData) {
   const name = formData.get("name") as string;
-  const iconKey = formData.get("iconKey") as string; 
+  const iconKey = formData.get("iconKey") as string;
 
   try {
     await prisma.technology.create({
       data: {
         name,
-        iconKey: iconKey || "Code", 
+        iconKey: iconKey || "Code",
       },
     });
   } catch (error) {
@@ -126,14 +138,41 @@ export async function createTechnology(formData: FormData) {
 
 export async function deleteTechnology(id: string) {
   try {
-    await prisma.technology.delete({
-      where: { id },
-    });
+    await prisma.technology.delete({ where: { id } });
   } catch (error) {
     console.error("Erro ao deletar tech:", error);
     throw new Error("Erro ao deletar tecnologia.");
   }
   revalidatePath("/admin/techs");
+}
+
+export async function addImage(projectId: string, formData: FormData) {
+  const file = formData.get("file") as File;
+  const type = formData.get("type") as string;
+
+  if (!file) return;
+
+  try {
+    const publicUrl = await uploadFile(file);
+
+    if (!publicUrl) {
+      throw new Error("Falha ao gerar URL do arquivo");
+    }
+
+    await prisma.projectImage.create({
+      data: {
+        projectId,
+        url: publicUrl,
+        type: type || "DESKTOP",
+        isCover: false,
+      },
+    });
+  } catch (error) {
+    console.error("Erro ao adicionar imagem:", error);
+    throw new Error("Erro ao adicionar imagem.");
+  }
+  
+  revalidatePath(`/admin/projects/${projectId}/edit`);
 }
 
 export async function deleteImage(imageId: string, projectId: string) {
@@ -206,35 +245,6 @@ export async function saveProfile(formData: FormData) {
   redirect("/admin/profile");
 }
 
-export async function addImage(projectId: string, formData: FormData) {
-  const file = formData.get("file") as File; 
-  const type = formData.get("type") as string;
-
-  if (!file) return;
-
-  try {
-    const publicUrl = await uploadFile(file);
-
-    if (!publicUrl) {
-      throw new Error("Falha ao gerar URL do arquivo");
-    }
-
-    await prisma.projectImage.create({
-      data: {
-        projectId,
-        url: publicUrl,
-        type: type || "DESKTOP",
-        isCover: false,
-      },
-    });
-  } catch (error) {
-    console.error("Erro ao adicionar imagem:", error);
-    throw new Error("Erro ao adicionar imagem.");
-  }
-  
-  revalidatePath(`/admin/projects/${projectId}/edit`);
-}
-
 export async function createExperience(formData: FormData) {
   const company = formData.get("company") as string;
   const role = formData.get("role") as string;
@@ -281,7 +291,6 @@ export async function createCertification(formData: FormData) {
   const highlights = formData.get("highlights") as string;
   
   const technologyIds = formData.getAll("technologies") as string[];
-
   const file = formData.get("file") as File;
   let imageUrl = "";
   
