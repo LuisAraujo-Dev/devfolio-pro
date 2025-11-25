@@ -13,6 +13,10 @@ export default async function AboutPage() {
     orderBy: { startDate: "desc" },
   });
 
+  const educations = await prisma.education.findMany({
+    orderBy: { startDate: "desc" },
+  });
+
   const data = {
     name: profile?.name || "Luís",
     headline: profile?.headline || "Engenheiro de Software",
@@ -23,8 +27,8 @@ export default async function AboutPage() {
   };
 
   return (
-    <div className="min-h-screen pb-20 pt-24"> 
-      <div className="container mx-auto px-6 max-w-3xl"> 
+    <div className="min-h-screen pb-20 pt-24">
+      <div className="container mx-auto px-6 max-w-3xl">
         
         <section className="mb-20 text-center">
           <FadeIn>
@@ -122,27 +126,26 @@ export default async function AboutPage() {
             </h2>
 
             <div className="grid gap-4">
-              <div className="group flex items-center justify-between p-5 rounded-xl border border-white/5 bg-surface hover:border-white/10 transition-colors">
-                <div>
-                  <h3 className="font-semibold text-white">Engenharia de Software</h3>
-                  <p className="text-sm text-muted mt-1">UNICSUL - Bacharelado</p>
+              {educations.map((edu) => (
+                <div key={edu.id} className="group flex items-center justify-between p-5 rounded-xl border border-white/5 bg-surface hover:border-white/10 transition-colors">
+                  <div>
+                    <h3 className="font-semibold text-white">{edu.course}</h3>
+                    <p className="text-sm text-muted mt-1">{edu.institution}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className={`block text-xs font-medium mb-1 ${!edu.endDate ? 'text-primary' : 'text-muted'}`}>
+                      {!edu.endDate ? 'Em andamento' : 'Concluído'}
+                    </span>
+                    <span className="text-xs text-muted">
+                      {new Date(edu.startDate).getFullYear()} - {edu.endDate ? new Date(edu.endDate).getFullYear() : 'Atual'}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <span className="block text-xs text-primary font-medium mb-1">Em andamento</span>
-                  <span className="text-xs text-muted">2025 - 2029</span>
-                </div>
-              </div>
+              ))}
 
-              <div className="group flex items-center justify-between p-5 rounded-xl border border-white/5 bg-surface hover:border-white/10 transition-colors">
-                <div>
-                  <h3 className="font-semibold text-white">Programador Full-Stack</h3>
-                  <p className="text-sm text-muted mt-1">SENAI - Qualificação</p>
-                </div>
-                <div className="text-right">
-                  <span className="block text-xs text-muted font-medium mb-1">Em andamento</span>
-                  <span className="text-xs text-muted">2025 - 2026</span>
-                </div>
-              </div>
+              {educations.length === 0 && (
+                <p className="text-muted italic">Nenhuma formação cadastrada.</p>
+              )}
             </div>
           </FadeIn>
         </section>

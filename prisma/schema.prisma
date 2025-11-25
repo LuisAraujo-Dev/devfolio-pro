@@ -98,3 +98,13 @@ model Certification {
 
   createdAt     DateTime @default(now())
 }
+
+model Education {
+  id          String    @id @default(cuid())
+  institution String    
+  course      String    
+  startDate   DateTime
+  endDate     DateTime? 
+  
+  createdAt   DateTime  @default(now())
+}

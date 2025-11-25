@@ -3,14 +3,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FolderKanban, User, Cpu, Briefcase, Award } from "lucide-react";
+import { LayoutDashboard, FolderKanban, User, Cpu, Briefcase, Award, GraduationCap } from "lucide-react";
 
 export function SidebarNav() {
   const pathname = usePathname();
 
-  // Função auxiliar para verificar se o link está ativo
   const isActive = (path: string) => {
-    // Caso especial para o Dashboard (exato)
     if (path === "/admin") {
       return pathname === "/admin";
     }
@@ -34,7 +32,7 @@ export function SidebarNav() {
       icon: Cpu,
     },
     {
-      name: "Certificações", // NOVO
+      name: "Certificações",
       href: "/admin/certifications",
       icon: Award,
     },
@@ -42,6 +40,11 @@ export function SidebarNav() {
       name: "Experiência",
       href: "/admin/experiences",
       icon: Briefcase,
+    },
+    {
+      name: "Formação",
+      href: "/admin/education",
+      icon: GraduationCap,
     },
     {
       name: "Meu Perfil",
@@ -64,8 +67,8 @@ export function SidebarNav() {
               flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors
               ${
                 active
-                  ? "bg-primary/10 text-primary border border-primary/20" 
-                  : "text-muted hover:text-white hover:bg-white/5 border border-transparent" 
+                  ? "bg-primary/10 text-primary border border-primary/20" // Estilo Ativo
+                  : "text-muted hover:text-white hover:bg-white/5 border border-transparent" // Estilo Inativo
               }
             `}
           >

@@ -408,3 +408,63 @@ export async function updateExperience(id: string, formData: FormData) {
   revalidatePath("/admin/experiences");
   redirect("/admin/experiences");
 }
+
+export async function createEducation(formData: FormData) {
+  const institution = formData.get("institution") as string;
+  const course = formData.get("course") as string;
+  const startDateStr = formData.get("startDate") as string;
+  const endDateStr = formData.get("endDate") as string;
+
+  try {
+    await prisma.education.create({
+      data: {
+        institution,
+        course,
+        startDate: new Date(startDateStr),
+        endDate: endDateStr ? new Date(endDateStr) : null,
+      },
+    });
+  } catch (error) {
+    console.error("Erro ao criar formação:", error);
+    throw new Error("Erro ao criar formação.");
+  }
+
+  revalidatePath("/about");
+  revalidatePath("/admin/education");
+}
+
+export async function updateEducation(id: string, formData: FormData) {
+  const institution = formData.get("institution") as string;
+  const course = formData.get("course") as string;
+  const startDateStr = formData.get("startDate") as string;
+  const endDateStr = formData.get("endDate") as string;
+
+  try {
+    await prisma.education.update({
+      where: { id },
+      data: {
+        institution,
+        course,
+        startDate: new Date(startDateStr),
+        endDate: endDateStr ? new Date(endDateStr) : null,
+      },
+    });
+  } catch (error) {
+    console.error("Erro ao atualizar formação:", error);
+    throw new Error("Erro ao atualizar formação.");
+  }
+
+  revalidatePath("/about");
+  revalidatePath("/admin/education");
+  redirect("/admin/education");
+}
+
+export async function deleteEducation(id: string) {
+  try {
+    await prisma.education.delete({ where: { id } });
+  } catch (error) {
+    console.error("Erro ao deletar formação:", error);
+  }
+  revalidatePath("/about");
+  revalidatePath("/admin/education");
+}
