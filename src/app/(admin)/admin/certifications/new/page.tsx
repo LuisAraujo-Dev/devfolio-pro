@@ -40,7 +40,7 @@ export default async function NewCertificationPage() {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <label className="text-sm font-medium text-muted">Data de Emissão</label>
-              <input type="date" name="issuedAt" required className="w-full rounded-md border border-white/10 bg-background px-3 py-2 text-white focus:border-primary focus:outline-none [color-scheme:dark]" />
+              <input type="date" name="issuedAt" required className="w-full rounded-md border border-white/10 bg-background px-3 py-2 text-white focus:border-primary focus:outline-none scheme:dark" />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-muted">Link da Credencial (Opcional)</label>
