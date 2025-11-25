@@ -1,18 +1,23 @@
+// src/app/(admin)/admin/certifications/new/page.tsx
 import { createCertification } from "@/src/app/lib/actions";
 import { TechSelector } from "@/src/components/admin/TechSelector";
 import { PrismaClient } from "@prisma/client";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = 'force-dynamic'; 
+
 const prisma = new PrismaClient();
 
 export default async function NewCertificationPage() {
-  const allTechs = await prisma.technology.findMany({ orderBy: { name: 'asc' } });
+  const allTechs = await prisma.technology.findMany({ 
+    orderBy: { name: 'asc' } 
+  });
 
   return (
     <div className="max-w-3xl mx-auto pb-20">
       <div className="mb-6 flex items-center gap-4">
-        <Link href="/admin/certifications" className="rounded-full p-2 hover:bg-white/5 text-muted hover:text-white">
+        <Link href="/admin/certifications" className="rounded-full p-2 hover:bg-white/5 text-muted hover:text-white transition-colors">
           <ArrowLeft className="size-5" />
         </Link>
         <h1 className="text-2xl font-bold text-white">Nova Certificação</h1>
@@ -35,7 +40,7 @@ export default async function NewCertificationPage() {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <label className="text-sm font-medium text-muted">Data de Emissão</label>
-              <input type="date" name="issuedAt" required className="w-full rounded-md border border-white/10 bg-background px-3 py-2 text-white focus:border-primary focus:outline-none scheme:dark" />
+              <input type="date" name="issuedAt" required className="w-full rounded-md border border-white/10 bg-background px-3 py-2 text-white focus:border-primary focus:outline-none [color-scheme:dark]" />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-muted">Link da Credencial (Opcional)</label>

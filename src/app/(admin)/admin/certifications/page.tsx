@@ -1,6 +1,6 @@
 // src/app/(admin)/admin/certifications/page.tsx
 import { PrismaClient } from "@prisma/client";
-import { Award, Plus, Trash2, Calendar, ExternalLink } from "lucide-react";
+import { Award, Plus, Trash2, Calendar, ExternalLink, Pencil } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { deleteCertification } from "@/src/app/lib/actions";
@@ -38,7 +38,6 @@ export default async function CertificationsPage() {
             key={cert.id}
             className="group overflow-hidden rounded-xl border border-white/10 bg-surface flex flex-col"
           >
-            {/* Preview da Imagem */}
             <div className="relative h-40 w-full bg-black/50">
               <Image
                 src={cert.imageUrl}
@@ -77,7 +76,6 @@ export default async function CertificationsPage() {
                 {new Date(cert.issuedAt).toLocaleDateString("pt-BR")}
               </div>
 
-              {/* Techs */}
               <div className="flex flex-wrap gap-1 mb-4">
                 {cert.technologies.slice(0, 3).map((t) => (
                   <span
@@ -94,7 +92,14 @@ export default async function CertificationsPage() {
                 )}
               </div>
 
-              <div className="mt-auto pt-4 border-t border-white/5 flex justify-end">
+              <div className="mt-auto pt-4 border-t border-white/5 flex justify-end items-center gap-3">
+                <Link
+                  href={`/admin/certifications/${cert.id}/edit`}
+                  className="flex items-center gap-2 text-xs text-muted hover:text-white transition-colors"
+                >
+                  <Pencil className="size-3" /> Editar
+                </Link>
+
                 <form
                   action={async () => {
                     "use server";
