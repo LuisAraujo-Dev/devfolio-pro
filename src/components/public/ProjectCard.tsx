@@ -1,4 +1,3 @@
-// src/components/public/ProjectCard.tsx
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
@@ -20,9 +19,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
   return (
     <Link 
       href={`/projects/${project.slug}`}
-      className="group relative flex flex-col overflow-hidden rounded-xl border border-white/10 bg-surface transition-all hover:-translate-y-1 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10"
+      className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-white/10 bg-surface transition-all hover:-translate-y-1 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10"
     >
-      <div className="relative aspect-video w-full overflow-hidden bg-black/50">
+      <div className="relative aspect-video w-full shrink-0 overflow-hidden bg-black/50">
         {coverImage ? (
           <Image
             src={coverImage.url}
@@ -38,19 +37,18 @@ export function ProjectCard({ project }: ProjectCardProps) {
       </div>
 
       <div className="flex flex-1 flex-col p-6">
-        <div className="flex items-start justify-between">
-            <h3 className="text-xl font-bold text-white group-hover:text-primary transition-colors">
-            {project.title}
+        <div className="flex items-start justify-between mb-3">
+            <h3 className="text-xl font-bold text-white group-hover:text-primary transition-colors line-clamp-1" title={project.title}>
+              {project.title}
             </h3>
             <ArrowRight className="size-5 -translate-x-4 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100 text-primary" />
         </div>
         
-        <p className="mt-2 line-clamp-2 text-sm text-muted flex-1">
+        <p className="text-sm text-muted line-clamp-3 mb-4 flex-1">
           {project.description}
         </p>
 
-        {/* --- ÍCONES DAS TECNOLOGIAS AQUI --- */}
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-auto flex flex-wrap gap-2 pt-4 border-t border-white/5">
           {project.technologies.slice(0, 5).map((tech) => (
             <TechBadge key={tech.name} name={tech.name} iconKey={tech.iconKey} />
           ))}
