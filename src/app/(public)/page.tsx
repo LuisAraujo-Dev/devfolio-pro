@@ -62,7 +62,7 @@ export default async function HomePage() {
             </FadeIn>
 
             <FadeIn delay={0.2}>
-              <h1 className="text-4xl font-extrabold tracking-tight bg-linear-to-br from-white via-white to-primary/60 bg-clip-text text-transparent sm:text-6xl md:leading-tight pb-2">
+              <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-br from-white via-white to-primary/60 bg-clip-text text-transparent sm:text-6xl md:leading-tight pb-2">
                 {data.headline}
               </h1>
             </FadeIn>

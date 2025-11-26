@@ -216,9 +216,15 @@ export async function saveProfile(formData: FormData) {
 
   if (file && file.size > 0) {
     const uploadedPath = await uploadFile(file);
-    if (uploadedPath) {
-      profileUrl = uploadedPath;
-    }
+    if (uploadedPath) profileUrl = uploadedPath;
+  }
+
+  const cvFile = formData.get("cvFile") as File;
+  let cvUrl = formData.get("cvUrl") as string;
+
+  if (cvFile && cvFile.size > 0) {
+    const uploadedCvPath = await uploadFile(cvFile);
+    if (uploadedCvPath) cvUrl = uploadedCvPath;
   }
 
   try {
@@ -227,11 +233,31 @@ export async function saveProfile(formData: FormData) {
     if (existingProfile) {
       await prisma.profile.update({
         where: { id: existingProfile.id },
-        data: { name, headline, bio, about, profileUrl, githubUrl, linkedinUrl, email },
+        data: { 
+            name, 
+            headline, 
+            bio, 
+            about, 
+            profileUrl, 
+            cvUrl,
+            githubUrl, 
+            linkedinUrl, 
+            email 
+        },
       });
     } else {
       await prisma.profile.create({
-        data: { name, headline, bio, about, profileUrl, githubUrl, linkedinUrl, email },
+        data: { 
+            name, 
+            headline, 
+            bio, 
+            about, 
+            profileUrl, 
+            cvUrl, 
+            githubUrl, 
+            linkedinUrl, 
+            email 
+        },
       });
     }
   } catch (error) {
@@ -468,3 +494,4 @@ export async function deleteEducation(id: string) {
   revalidatePath("/about");
   revalidatePath("/admin/education");
 }
+

@@ -82,6 +82,8 @@ model Profile {
   linkedinUrl String?
   email       String?
 
+  cvUrl       String?  
+
   updatedAt   DateTime @updatedAt
 }
 
