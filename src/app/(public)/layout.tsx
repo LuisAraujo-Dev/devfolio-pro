@@ -33,7 +33,7 @@ export default function PublicLayout({
                </span>
                
                {/* Avatar Pequeno (Desktop) */}
-               <div className="relative size-6 rounded-full bg-white flex items-center justify-center overflow-hidden ring-2 ring-white/10">
+               <div className="relative size-8 flex items-center justify-center overflow-hidden ">
                   {/* <Image src="/logo.png" alt="Logo" fill className="object-cover" /> */}
                   <div className="size-3 bg-black rounded-full"></div> 
                </div>
